@@ -643,3 +643,117 @@
 
   loadOrders();
 })();
+
+// Pull to Refresh
+let startY = 0;
+let isPulling = false;
+const pullThreshold = 100;
+
+document.addEventListener('touchstart', (e) => {
+  if (window.scrollY === 0) {
+    startY = e.touches[0].clientY;
+    isPulling = true;
+  }
+});
+
+document.addEventListener('touchmove', (e) => {
+  if (!isPulling) return;
+  
+  const currentY = e.touches[0].clientY;
+  const diff = currentY - startY;
+  
+  if (diff > 0 && window.scrollY === 0) {
+    e.preventDefault();
+    const pullIndicator = document.querySelector('.pull-to-refresh') || createPullIndicator();
+    pullIndicator.style.top = Math.min(diff - 60, 0) + 'px';
+  }
+});
+
+document.addEventListener('touchend', (e) => {
+  if (!isPulling) return;
+  isPulling = false;
+  
+  const pullIndicator = document.querySelector('.pull-to-refresh');
+  if (pullIndicator) {
+    const currentTop = parseInt(pullIndicator.style.top || 0);
+    if (currentTop >= -10) {
+      // Trigger refresh
+      pullIndicator.classList.add('active');
+      location.reload();
+    } else {
+      pullIndicator.style.top = '-60px';
+    }
+  }
+});
+
+function createPullIndicator() {
+  const indicator = document.createElement('div');
+  indicator.className = 'pull-to-refresh';
+  indicator.innerHTML = '<div class="spinner"></div>';
+  document.body.appendChild(indicator);
+  return indicator;
+}
+
+
+// Swipe Gestures for Navigation
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', (e) => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', (e) => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+});
+
+function handleSwipe() {
+  const swipeThreshold = 100;
+  const diff = touchStartX - touchEndX;
+  
+  if (Math.abs(diff) > swipeThreshold) {
+    if (diff > 0) {
+      // Swipe left - next view
+      const currentView = document.querySelector('.view.active');
+      const allViews = document.querySelectorAll('.view');
+      const currentIndex = Array.from(allViews).indexOf(currentView);
+      
+      if (currentIndex < allViews.length - 1) {
+        const nextView = allViews[currentIndex + 1];
+        const viewName = nextView.id.replace('view-', '');
+        go(viewName);
+      }
+    } else {
+      // Swipe right - previous view
+      const currentView = document.querySelector('.view.active');
+      const allViews = document.querySelectorAll('.view');
+      const currentIndex = Array.from(allViews).indexOf(currentView);
+      
+      if (currentIndex > 0) {
+        const prevView = allViews[currentIndex - 1];
+        const viewName = prevView.id.replace('view-', '');
+        go(viewName);
+      }
+    }
+  }
+}
+
+
+// Bottom Navigation
+document.querySelectorAll('.bottom-nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const view = item.dataset.view;
+    go(view);
+  });
+});
+
+// Update bottom nav active state
+const originalGo = go;
+go = function(view) {
+  originalGo(view);
+  document.querySelectorAll('.bottom-nav-item').forEach(item => {
+    item.classList.toggle('active', item.dataset.view === view);
+  });
+};
+
