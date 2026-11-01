@@ -1,7 +1,13 @@
+-- ============================================
+-- YAS Order Tracking System - Supabase Schema
+-- ============================================
+
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Create orders table
+-- ============================================
+-- ORDERS TABLE
+-- ============================================
 CREATE TABLE IF NOT EXISTS orders (
   id TEXT PRIMARY KEY,
   customer TEXT NOT NULL,
@@ -29,8 +35,16 @@ CREATE TABLE IF NOT EXISTS orders (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')
 );
 
--- Enable Row Level Security
+-- ============================================
+-- ROW LEVEL SECURITY (RLS)
+-- ============================================
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Public read access" ON orders;
+DROP POLICY IF EXISTS "Public insert access" ON orders;
+DROP POLICY IF EXISTS "Public update access" ON orders;
+DROP POLICY IF EXISTS "Public delete access" ON orders;
 
 -- Create policies for public access
 -- Allow anyone to read orders
@@ -49,11 +63,31 @@ CREATE POLICY "Public update access" ON orders
 CREATE POLICY "Public delete access" ON orders
   FOR DELETE USING (true);
 
+-- ============================================
+-- INDEXES FOR PERFORMANCE
+-- ============================================
+-- Drop existing indexes if they exist
+DROP INDEX IF EXISTS idx_orders_created_at;
+DROP INDEX IF EXISTS idx_orders_status;
+DROP INDEX IF EXISTS idx_orders_driver;
+DROP INDEX IF EXISTS idx_orders_id;
+
 -- Create index on created_at for better performance
-CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
+CREATE INDEX idx_orders_created_at ON orders(created_at DESC);
 
 -- Create index on status for filtering
-CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX idx_orders_status ON orders(status);
 
 -- Create index on driver for filtering
-CREATE INDEX IF NOT EXISTS idx_orders_driver ON orders(driver);
+CREATE INDEX idx_orders_driver ON orders(driver);
+
+-- Create index on id for faster lookups
+CREATE INDEX idx_orders_id ON orders(id);
+
+-- ============================================
+-- NOTES
+-- ============================================
+-- This schema contains only one table: orders
+-- The entire application uses this single table
+-- to manage all order-related data
+-- ============================================
