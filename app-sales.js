@@ -197,6 +197,56 @@
       }
     });
 
+    // Driver Performance Report
+    const drivers = ['ناصر اسلام', 'ابراهيم ذكري', 'عمرو حرحش', 'جمعة السيد'];
+    const driverStats = drivers.map(driver => {
+      const driverOrders = orders.filter(o => o.driver === driver);
+      const driverCompleted = driverOrders.filter(o => o.status === 'تم التوصيل').length;
+      const driverPending = driverOrders.filter(o => ['تم طلبه', 'تم الشحن', 'خرج للتوصيل'].includes(o.status)).length;
+      const driverRating = driverOrders
+        .filter(o => o.driverRating)
+        .reduce((sum, o) => sum + o.driverRating, 0) / (driverOrders.filter(o => o.driverRating).length || 1);
+
+      return {
+        name: driver,
+        total: driverOrders.length,
+        completed: driverCompleted,
+        pending: driverPending,
+        rating: driverRating.toFixed(1)
+      };
+    });
+
+    const driverStatsHtml = driverStats.map(d => `
+      <div style="padding: 12px; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <strong>${d.name}</strong>
+          <span style="color: #f59e0b;">★ ${d.rating}</span>
+        </div>
+        <div style="display: flex; gap: 20px; margin-top: 8px; font-size: 14px;">
+          <span>إجمالي: ${d.total}</span>
+          <span style="color: #10b981;">مكتمل: ${d.completed}</span>
+          <span style="color: #f59e0b;">قيد التوصيل: ${d.pending}</span>
+        </div>
+      </div>
+    `).join('');
+
+    // Add driver stats section if it doesn't exist
+    if (!document.getElementById('driver-stats-section')) {
+      const dashboardCharts = document.querySelector('.dashboard-charts');
+      const driverSection = document.createElement('section');
+      driverSection.className = 'panel';
+      driverSection.id = 'driver-stats-section';
+      driverSection.innerHTML = `
+        <div class="section-title">
+          <h3>أداء السائقين</h3>
+          <p>تقرير أداء كل سائق</p>
+        </div>
+        <div id="driver-stats-container">${driverStatsHtml}</div>
+      `;
+      dashboardCharts.parentNode.insertBefore(driverSection, dashboardCharts.nextSibling);
+    } else {
+      document.getElementById('driver-stats-container').innerHTML = driverStatsHtml;
+    }
   }
 
   function generateReport(period){
