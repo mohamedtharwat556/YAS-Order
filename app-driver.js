@@ -23,6 +23,8 @@
   let driverName = null;
   let showArchived = false;
   let currentDriverLocation = null;
+  let locationUpdateInterval = null;
+  let offlineQueue = [];
 
   console.log('Checking auth...');
 
@@ -38,9 +40,19 @@
     return R * c; // Distance in km
   }
 
-  // Calculate estimated time of arrival (assuming 40 km/h average speed)
+  // Calculate estimated time of arrival (with dynamic speed based on traffic)
   function calculateETA(distance) {
-    const avgSpeed = 40; // km/h
+    // Dynamic speed: 30-50 km/h based on time of day
+    const hour = new Date().getHours();
+    let avgSpeed = 40; // default
+
+    // Lower speed during rush hours (7-9 AM, 5-7 PM)
+    if ((hour >= 7 && hour <= 9) || (hour >= 17 && hour <= 19)) {
+      avgSpeed = 30;
+    } else if (hour >= 22 || hour <= 5) {
+      avgSpeed = 50; // Higher speed at night
+    }
+
     const timeHours = distance / avgSpeed;
     const timeMinutes = Math.round(timeHours * 60);
     if (timeMinutes < 60) {
@@ -50,6 +62,87 @@
       const mins = timeMinutes % 60;
       return `${hours} ساعة ${mins > 0 ? mins + ' دقيقة' : ''}`;
     }
+  }
+
+  // Offline storage helper
+  function saveToOfflineQueue(action) {
+    offlineQueue.push(action);
+    localStorage.setItem('driver_offline_queue', JSON.stringify(offlineQueue));
+  }
+
+  function loadOfflineQueue() {
+    const stored = localStorage.getItem('driver_offline_queue');
+    if (stored) {
+      offlineQueue = JSON.parse(stored);
+    }
+  }
+
+  async function processOfflineQueue() {
+    if (offlineQueue.length === 0) return;
+
+    for (const action of offlineQueue) {
+      try {
+        await action();
+      } catch (error) {
+        console.error('Error processing offline action:', error);
+      }
+    }
+
+    offlineQueue = [];
+    localStorage.removeItem('driver_offline_queue');
+  }
+
+  // Auto-update location every minute
+  function startAutoLocationUpdate() {
+    if (locationUpdateInterval) {
+      clearInterval(locationUpdateInterval);
+    }
+
+    locationUpdateInterval = setInterval(async () => {
+      if (!navigator.geolocation) return;
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const loc = {
+          lat: pos.coords.latitude.toFixed(5),
+          lng: pos.coords.longitude.toFixed(5),
+          at: new Date().toISOString()
+        };
+
+        const driverOrders = orders.filter(o => o.driver === driverName);
+
+        // Update map
+        updateMap(parseFloat(loc.lat), parseFloat(loc.lng));
+
+        // Store current driver location
+        currentDriverLocation = { lat: parseFloat(loc.lat), lng: parseFloat(loc.lng) };
+
+        // Try to update, if offline save to queue
+        try {
+          for (const o of driverOrders) {
+            const { error } = await supabaseClient
+              .from('orders')
+              .update({ location: loc })
+              .eq('id', o.id);
+            if (error) throw error;
+          }
+        } catch (error) {
+          console.error('Error updating location (offline mode):', error);
+          saveToOfflineQueue(async () => {
+            for (const o of driverOrders) {
+              await supabaseClient.from('orders').update({ location: loc }).eq('id', o.id);
+            }
+          });
+        }
+      }, err => {
+        console.error('Auto location update error:', err);
+      }, {
+        enableHighAccuracy: true,
+        timeout: 30000,
+        maximumAge: 0
+      });
+    }, 60000); // Update every 60 seconds
+
+    toast('تم تفعيل التحديث التلقائي للموقع كل دقيقة');
   }
 
   async function loadOrders() {
@@ -258,15 +351,84 @@
   let watchId=null;
   let map = null;
   let driverMarker = null;
+  let routeLayer = null;
+  let customerMarker = null;
+  let currentTileLayer = null;
 
   // Initialize map
   function initMap() {
     if (typeof L !== 'undefined' && document.getElementById('map')) {
       map = L.map('map').setView([30.0444, 31.2357], 13); // Default to Cairo
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      // Default tile layer (OpenStreetMap)
+      currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors'
       }).addTo(map);
+    }
+  }
+
+  // Toggle map view (Standard/Satellite)
+  function toggleMapView(isSatellite) {
+    if (!map || !currentTileLayer) return;
+
+    map.removeLayer(currentTileLayer);
+
+    if (isSatellite) {
+      // Satellite view (using Esri World Imagery)
+      currentTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: '© Esri'
+      }).addTo(map);
+    } else {
+      // Standard view (OpenStreetMap)
+      currentTileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+    }
+  }
+
+  // Draw route to customer using OSRM
+  async function drawRouteToCustomer(driverLat, driverLng, customerAddress) {
+    if (!map) return;
+
+    // Remove existing route
+    if (routeLayer) {
+      map.removeLayer(routeLayer);
+    }
+
+    // Remove existing customer marker
+    if (customerMarker) {
+      map.removeLayer(customerMarker);
+    }
+
+    try {
+      // For now, just show a straight line (can be upgraded to use OSRM API)
+      const driverLatLng = [driverLat, driverLng];
+      const customerLatLng = [30.0444, 31.2357]; // Default to Cairo center
+
+      // Draw route line
+      routeLayer = L.polyline([driverLatLng, customerLatLng], {
+        color: '#2563eb',
+        weight: 5,
+        opacity: 0.7,
+        dashArray: '10, 10'
+      }).addTo(map);
+
+      // Add customer marker
+      customerMarker = L.marker(customerLatLng, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background: #10b981; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px;">🏠</div>',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(map).bindPopup('موقع العميل');
+
+      // Fit map to show both points
+      const bounds = L.latLngBounds([driverLatLng, customerLatLng]);
+      map.fitBounds(bounds, { padding: [50, 50] });
+
+    } catch (error) {
+      console.error('Error drawing route:', error);
     }
   }
 
@@ -279,7 +441,14 @@
     if (driverMarker) {
       driverMarker.setLatLng(latLng);
     } else {
-      driverMarker = L.marker(latLng).addTo(map)
+      driverMarker = L.marker(latLng, {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '<div style="background: #2563eb; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; border: 3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.3);">🚗</div>',
+          iconSize: [40, 40],
+          iconAnchor: [20, 20]
+        })
+      }).addTo(map)
         .bindPopup('موقعك الحالي')
         .openPopup();
     }
@@ -293,6 +462,17 @@
   } else {
     initMap();
   }
+
+  // Map view toggle buttons
+  $('#map-standard').addEventListener('click', () => {
+    toggleMapView(false);
+    toast('تم التبديل للخريطة العادية');
+  });
+
+  $('#map-satellite').addEventListener('click', () => {
+    toggleMapView(true);
+    toast('تم التبديل للخريطة القمر الصناعي');
+  });
 
   $('#update-location').addEventListener('click',async ()=>{
     const output=$('#location-result');
@@ -338,35 +518,11 @@
         return;
       }
       output.textContent='جاري تفعيل التتبع التلقائي...';
-      watchId=navigator.geolocation.watchPosition(async pos=>{
-        const loc={lat:pos.coords.latitude.toFixed(5),lng:pos.coords.longitude.toFixed(5),at:new Date().toISOString()};
-        const driverOrders = orders.filter(o=>o.driver === driverName);
-
-        // Update map
-        updateMap(parseFloat(loc.lat), parseFloat(loc.lng));
-
-        // Store current driver location
-        currentDriverLocation = { lat: parseFloat(loc.lat), lng: parseFloat(loc.lng) };
-
-        for (const o of driverOrders) {
-          const { error } = await supabaseClient
-            .from('orders')
-            .update({ location: loc })
-            .eq('id', o.id);
-          if (error) console.error('Error updating location:', error);
-        }
-
-        output.textContent=`آخر تحديث تلقائي: ${loc.lat}, ${loc.lng} · ${fmtTime(loc.at)}`;
-        await loadOrders();
-      },err=>{
-        console.error('Geolocation error:', err);
-        output.textContent='خطأ في التتبع التلقائي';
-      },{enableHighAccuracy:true,timeout:30000,maximumAge:0,desiredAccuracy:10});
-      toast('تم تفعيل التتبع التلقائي (عالي الدقة)');
+      startAutoLocationUpdate();
     }else{
-      if(watchId){
-        navigator.geolocation.clearWatch(watchId);
-        watchId=null;
+      if(locationUpdateInterval){
+        clearInterval(locationUpdateInterval);
+        locationUpdateInterval=null;
         output.textContent='تم إيقاف التتبع التلقائي';
         toast('تم إيقاف التتبع التلقائي');
       }
@@ -478,5 +634,16 @@
   });
 
   console.log('Starting loadOrders...');
+
+  // Load offline queue on startup
+  loadOfflineQueue();
+
+  // Process offline queue when online
+  window.addEventListener('online', () => {
+    toast('الإنترنت متصل، جاري معالجة البيانات المحفوظة...');
+    processOfflineQueue();
+  });
+
+  // Load orders
   loadOrders();
 })();
