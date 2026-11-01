@@ -387,7 +387,7 @@
     const reader=new FileReader();
     reader.onload=async ()=>{
       const base64=reader.result;
-      const { error }=await supabaseClient.from('orders').update({deliveryPhoto:base64}).eq('id',orderId);
+      const { error }=await supabaseClient.from('orders').update({deliveryphoto:base64}).eq('id',orderId);
       if(error){
         console.error('Error uploading photo:',error);
         toast('حدث خطأ أثناء رفع الصورة', 'error');
