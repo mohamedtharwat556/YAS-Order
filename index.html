@@ -94,7 +94,7 @@
         </section>
         <section class="panel form-panel"><div class="section-title"><span class="step">02</span><div><h3>تفاصيل الطلب</h3><p>الجهاز والماركة والملاحظات</p></div></div>
           <div class="field-grid">
-            <label class="full">نوع الجهاز <em>*</em><select name="deviceType" id="deviceType" required multiple onchange="updateProductQuantities()"><option value="">اختار نوع الجهاز (يمكن اختيار أكثر من واحد)</option><option value="لابتوب">لابتوب</option><option value="كمبيوتر مكتبي">كمبيوتر مكتبي</option><option value="شاشة تفاعلية">شاشة تفاعلية</option><option value="جهاز POS / كاشير">جهاز POS / كاشير</option><option value="بروجكتور">بروجكتور</option><option value="إكسسوارات">إكسسوارات</option><option value="أخرى">أخرى</option></select></label><div id="productQuantities" class="product-quantities"></div>
+             <label class="full">نوع الجهاز <em>*</em></label><div class="checkbox-group"><label><input type="checkbox" name="deviceType" value="لابتوب" onchange="updateProductQuantities()"> لابتوب</label><label><input type="checkbox" name="deviceType" value="كمبيوتر مكتبي" onchange="updateProductQuantities()"> كمبيوتر مكتبي</label><label><input type="checkbox" name="deviceType" value="شاشة تفاعلية" onchange="updateProductQuantities()"> شاشة تفاعلية</label><label><input type="checkbox" name="deviceType" value="جهاز POS / كاشير" onchange="updateProductQuantities()"> جهاز POS / كاشير</label><label><input type="checkbox" name="deviceType" value="بروجكتور" onchange="updateProductQuantities()"> بروجكتور</label><label><input type="checkbox" name="deviceType" value="إكسسوارات" onchange="updateProductQuantities()"> إكسسوارات</label><label><input type="checkbox" name="deviceType" value="أخرى" onchange="updateProductQuantities()"> أخرى</label></div><div id="productQuantities" class="product-quantities"></div>
             <label class="full">تفاصيل الطلب <em>*</em><textarea name="details" required rows="3" placeholder="وصف الطلب أو المنتج المطلوب" minlength="5"></textarea></label>
           </div>
         </section>
@@ -140,7 +140,7 @@
         </section>
         <section class="panel form-panel"><div class="section-title"><span class="step">02</span><div><h3>تفاصيل الطلب</h3><p>الجهاز والماركة والملاحظات</p></div></div>
           <div class="field-grid">
-            <label class="full">نوع الجهاز <em>*</em><select name="deviceType" id="deviceType" required multiple onchange="updateProductQuantities()"><option value="">اختار نوع الجهاز (يمكن اختيار أكثر من واحد)</option><option value="لابتوب">لابتوب</option><option value="كمبيوتر مكتبي">كمبيوتر مكتبي</option><option value="شاشة تفاعلية">شاشة تفاعلية</option><option value="جهاز POS / كاشير">جهاز POS / كاشير</option><option value="بروجكتور">بروجكتور</option><option value="إكسسوارات">إكسسوارات</option><option value="أخرى">أخرى</option></select></label><div id="productQuantities" class="product-quantities"></div>
+             <label class="full">نوع الجهاز <em>*</em></label><div class="checkbox-group"><label><input type="checkbox" name="deviceType" value="لابتوب" onchange="updateProductQuantities()"> لابتوب</label><label><input type="checkbox" name="deviceType" value="كمبيوتر مكتبي" onchange="updateProductQuantities()"> كمبيوتر مكتبي</label><label><input type="checkbox" name="deviceType" value="شاشة تفاعلية" onchange="updateProductQuantities()"> شاشة تفاعلية</label><label><input type="checkbox" name="deviceType" value="جهاز POS / كاشير" onchange="updateProductQuantities()"> جهاز POS / كاشير</label><label><input type="checkbox" name="deviceType" value="بروجكتور" onchange="updateProductQuantities()"> بروجكتور</label><label><input type="checkbox" name="deviceType" value="إكسسوارات" onchange="updateProductQuantities()"> إكسسوارات</label><label><input type="checkbox" name="deviceType" value="أخرى" onchange="updateProductQuantities()"> أخرى</label></div><div id="productQuantities" class="product-quantities"></div>
             <label class="full">تفاصيل الطلب <em>*</em><textarea name="details" required rows="3" placeholder="وصف الطلب أو المنتج المطلوب" minlength="5"></textarea></label>
           </div>
         </section>
@@ -174,13 +174,15 @@
   </nav>
 <script>
   function updateProductQuantities() {
-    const select = document.getElementById("deviceType");
+    const checkboxes = document.querySelectorAll("input[name=\"deviceType\"]:checked");
     const container = document.getElementById("productQuantities");
-    const selectedOptions = Array.from(select.selectedOptions).map(opt => opt.value);
+    const selectedValues = Array.from(checkboxes).map(cb => cb.value);
+    const container = document.getElementById("productQuantities");
+    // selectedValues already defined above
     
     container.innerHTML = "";
     
-    selectedOptions.forEach(value => {
+    selectedValues.forEach(value => {
       const label = document.createElement("label");
       label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="1" required>`;
       container.appendChild(label);
