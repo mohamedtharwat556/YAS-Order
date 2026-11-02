@@ -170,7 +170,16 @@
     console.log("updateProductQuantities called");
     const checkboxes = document.querySelectorAll("input[name=\"deviceType\"]:checked");
     const container = document.getElementById("productQuantities");
+    console.log("Container:", container);
+    console.log("Checkboxes:", checkboxes);
+    
+    if (!container) {
+      console.error("productQuantities container not found!");
+      return;
+    }
+    
     const selectedValues = Array.from(checkboxes).map(cb => cb.value);
+    console.log("Selected values:", selectedValues);
     
     // حفظ القيم الحالية
     const currentValues = {};
@@ -180,12 +189,19 @@
     
     container.innerHTML = "";
     
+    if (selectedValues.length === 0) {
+      container.innerHTML = "<p style='color: var(--muted); font-size: 14px;'>اختار منتجات لإظهار الكميات</p>";
+      return;
+    }
+    
     selectedValues.forEach(value => {
       const label = document.createElement("label");
       const savedValue = currentValues[`quantity_${value}`] || 1;
       label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="${savedValue}" required>`;
       container.appendChild(label);
     });
+    
+    console.log("Product quantities updated successfully");
   }
 </script>
   <div class="toast" id="toast" role="status"></div>
