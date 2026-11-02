@@ -101,7 +101,10 @@
     const titles={dashboard:'لوحة الإحصائيات',sales:'لوحة إدارة الطلبات',new_order:'إنشاء طلب جديد',edit_order:'تعديل الطلب'};
     $('#page-title').textContent=titles[view]||'YAS';
     if(view==='sales')renderSales();
-    if(view==='new_order')setReceivedAt();
+    if(view==='new_order'){
+      setReceivedAt();
+      updateProductQuantities();
+    }
     if(view==='dashboard')renderDashboard();
   }
   window.go = go;
