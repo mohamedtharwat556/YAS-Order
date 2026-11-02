@@ -175,14 +175,17 @@
     const selectedValues = Array.from(checkboxes).map(cb => cb.value);
     
     const currentValues = {};
-    container.querySelectorAll('input[type="number"]').forEach(input => {
+    container.querySelectorAll('input[type="number"][name^="quantity_"]').forEach(input => {
       currentValues[input.name] = input.value;
     });
     
-    container.innerHTML = "";
+    // احتفظ حقل الكمية الإجمالية
+    const totalQuantityInput = container.querySelector('input[name="quantity"]');
+    const totalQuantityValue = totalQuantityInput ? totalQuantityInput.value : 1;
+    
+    container.innerHTML = `<label>الكمية الإجمالية <input type="number" name="quantity" min="1" max="100" value="${totalQuantityValue}"></label>`;
     
     if (selectedValues.length === 0) {
-      container.innerHTML = "<p style='color: var(--muted); font-size: 14px;'>اختار منتجات لإظهار الكميات</p>";
       return;
     }
     
