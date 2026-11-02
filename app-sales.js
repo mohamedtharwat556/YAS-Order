@@ -485,9 +485,22 @@
         $('#edit_order_form').elements.phone.value=o.phone;
         $('#edit_order_form').elements.address.value=o.address;
         $('#edit_order_form').elements.mapLink.value=o.maplink||'';
-        $('#edit_order_form').elements.deviceType.value=o.devicetype;
+        // Handle multiple device types
+        const deviceTypeCheckboxes = document.querySelectorAll('#edit_order_form input[name="deviceType"]');
+        deviceTypeCheckboxes.forEach(cb => {
+          cb.checked = false;
+        });
+        if(o.devicetype) {
+          const types = o.devicetype.split(',');
+          types.forEach(type => {
+            const checkbox = document.querySelector(`#edit_order_form input[name="deviceType"][value="${type.trim()}"]`);
+            if(checkbox) checkbox.checked = true;
+          });
+        }
+        // Trigger updateProductQuantities to show quantity fields
+        updateProductQuantities();
         $('#edit_order_form').elements.brand.value=o.brand;
-        $('#edit_order_form').elements.quantity.value=o.quantity;
+        // Skip quantity field as it's now handled dynamically
         $('#edit_order_form').elements.details.value=o.details;
         $('#edit_order_form').elements.paymentMethod.value=o.paymentmethod;
         $('#edit_order_form').elements.paymentStatus.value=o.paymentstatus;
