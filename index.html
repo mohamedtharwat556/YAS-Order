@@ -85,7 +85,7 @@
         </section>
         <section class="panel form-panel"><div class="section-title"><span class="step">02</span><div><h3>تفاصيل الطلب</h3><p>الجهاز والماركة والملاحظات</p></div></div>
           <div class="field-grid">
-             <label class="full">نوع الجهاز <em>*</em></label><div class="checkbox-group"><label><input type="checkbox" name="deviceType" value="لابتوب" onchange="updateProductQuantities('new')"> لابتوب</label><label><input type="checkbox" name="deviceType" value="كمبيوتر مكتبي" onchange="updateProductQuantities('new')"> كمبيوتر مكتبي</label><label><input type="checkbox" name="deviceType" value="شاشة تفاعلية" onchange="updateProductQuantities('new')"> شاشة تفاعلية</label><label><input type="checkbox" name="deviceType" value="جهاز POS / كاشير" onchange="updateProductQuantities('new')"> جهاز POS / كاشير</label><label><input type="checkbox" name="deviceType" value="بروجكتور" onchange="updateProductQuantities('new')"> بروجكتور</label><label><input type="checkbox" name="deviceType" value="إكسسوارات" onchange="updateProductQuantities('new')"> إكسسوارات</label><label><input type="checkbox" name="deviceType" value="أخرى" onchange="updateProductQuantities('new')"> أخرى</label></div><div id="productQuantitiesNew" class="product-quantities"></div>
+             <label class="full">نوع الجهاز <em>*</em></label><div class="checkbox-group"><label><input type="checkbox" name="deviceType" value="لابتوب" onchange="updateProductQuantities()"> لابتوب</label><label><input type="checkbox" name="deviceType" value="كمبيوتر مكتبي" onchange="updateProductQuantities()"> كمبيوتر مكتبي</label><label><input type="checkbox" name="deviceType" value="شاشة تفاعلية" onchange="updateProductQuantities()"> شاشة تفاعلية</label><label><input type="checkbox" name="deviceType" value="جهاز POS / كاشير" onchange="updateProductQuantities()"> جهاز POS / كاشير</label><label><input type="checkbox" name="deviceType" value="بروجكتور" onchange="updateProductQuantities()"> بروجكتور</label><label><input type="checkbox" name="deviceType" value="إكسسوارات" onchange="updateProductQuantities()"> إكسسوارات</label><label><input type="checkbox" name="deviceType" value="أخرى" onchange="updateProductQuantities()"> أخرى</label></div><div id="productQuantities" class="product-quantities"></div>
             <label class="full">الماركة / الموديل <em>*</em><input name="brand" required placeholder="مثال: Lenovo ThinkPad" minlength="2"></label>
             <label class="full">تفاصيل الطلب <em>*</em><textarea name="details" required rows="3" placeholder="وصف الطلب أو المنتج المطلوب" minlength="5"></textarea></label>
           </div>
@@ -132,7 +132,7 @@
         </section>
         <section class="panel form-panel"><div class="section-title"><span class="step">02</span><div><h3>تفاصيل الطلب</h3><p>الجهاز والماركة والملاحظات</p></div></div>
           <div class="field-grid">
-             <label class="full">نوع الجهاز <em>*</em></label><div class="checkbox-group"><label><input type="checkbox" name="deviceType" value="لابتوب" onchange="updateProductQuantities('new')"> لابتوب</label><label><input type="checkbox" name="deviceType" value="كمبيوتر مكتبي" onchange="updateProductQuantities('new')"> كمبيوتر مكتبي</label><label><input type="checkbox" name="deviceType" value="شاشة تفاعلية" onchange="updateProductQuantities('new')"> شاشة تفاعلية</label><label><input type="checkbox" name="deviceType" value="جهاز POS / كاشير" onchange="updateProductQuantities('new')"> جهاز POS / كاشير</label><label><input type="checkbox" name="deviceType" value="بروجكتور" onchange="updateProductQuantities('new')"> بروجكتور</label><label><input type="checkbox" name="deviceType" value="إكسسوارات" onchange="updateProductQuantities('new')"> إكسسوارات</label><label><input type="checkbox" name="deviceType" value="أخرى" onchange="updateProductQuantities('new')"> أخرى</label></div><div id="productQuantitiesNew" class="product-quantities"></div>
+             <label class="full">نوع الجهاز <em>*</em></label><div class="checkbox-group"><label><input type="checkbox" name="deviceType" value="لابتوب" onchange="updateProductQuantities()"> لابتوب</label><label><input type="checkbox" name="deviceType" value="كمبيوتر مكتبي" onchange="updateProductQuantities()"> كمبيوتر مكتبي</label><label><input type="checkbox" name="deviceType" value="شاشة تفاعلية" onchange="updateProductQuantities()"> شاشة تفاعلية</label><label><input type="checkbox" name="deviceType" value="جهاز POS / كاشير" onchange="updateProductQuantities()"> جهاز POS / كاشير</label><label><input type="checkbox" name="deviceType" value="بروجكتور" onchange="updateProductQuantities()"> بروجكتور</label><label><input type="checkbox" name="deviceType" value="إكسسوارات" onchange="updateProductQuantities()"> إكسسوارات</label><label><input type="checkbox" name="deviceType" value="أخرى" onchange="updateProductQuantities()"> أخرى</label></div><div id="productQuantities" class="product-quantities"></div>
             <label class="full">الماركة / الموديل <em>*</em><input name="brand" required placeholder="مثال: Lenovo ThinkPad" minlength="2"></label>
             <label class="full">تفاصيل الطلب <em>*</em><textarea name="details" required rows="3" placeholder="وصف الطلب أو المنتج المطلوب" minlength="5"></textarea></label>
           </div>
@@ -166,25 +166,14 @@
     </button>
   </nav>
 <script>
-  function updateProductQuantities(formType) {
-    console.log("updateProductQuantities called with:", formType);
-    const containerId = formType === 'new' ? 'productQuantitiesNew' : 'productQuantities';
-    const formId = formType === 'new' ? 'order-form' : 'edit_order_form';
+  function updateProductQuantities() {
+    const checkboxes = document.querySelectorAll("input[name=\"deviceType\"]:checked");
+    const container = document.getElementById("productQuantities");
     
-    const checkboxes = document.querySelectorAll(`#${formId} input[name="deviceType"]:checked`);
-    const container = document.getElementById(containerId);
-    console.log("Container:", container, "ID:", containerId);
-    console.log("Checkboxes:", checkboxes);
-    
-    if (!container) {
-      console.error("productQuantities container not found! ID:", containerId);
-      return;
-    }
+    if (!container) return;
     
     const selectedValues = Array.from(checkboxes).map(cb => cb.value);
-    console.log("Selected values:", selectedValues);
     
-    // حفظ القيم الحالية
     const currentValues = {};
     container.querySelectorAll('input[type="number"]').forEach(input => {
       currentValues[input.name] = input.value;
@@ -203,8 +192,6 @@
       label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="${savedValue}" required>`;
       container.appendChild(label);
     });
-    
-    console.log("Product quantities updated successfully");
   }
 </script>
   <div class="toast" id="toast" role="status"></div>
