@@ -104,6 +104,7 @@
     if(view==='new_order')setReceivedAt();
     if(view==='dashboard')renderDashboard();
   }
+  window.go = go;
   function setReceivedAt(){const el=$('#received-at');if(el&&!el.value){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());el.value=d.toISOString().slice(0,16);}}
   let showCompletedOnly = false;
   
