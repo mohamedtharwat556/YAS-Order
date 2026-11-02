@@ -574,15 +574,26 @@
     }, 0);
     const orderId = `YAS-${maxOrderNum + 1}`;
 
+    // Collect device types and quantities
+    const deviceTypeCheckboxes = document.querySelectorAll('#order-form input[name="deviceType"]:checked');
+    const deviceTypes = Array.from(deviceTypeCheckboxes).map(cb => cb.value);
+    const quantities = {};
+    deviceTypes.forEach(type => {
+      const quantityInput = document.querySelector(`#order-form input[name="quantity_${type}"]`);
+      if(quantityInput) {
+        quantities[type] = quantityInput.value;
+      }
+    });
+
     const o={
       id: orderId,
       customer: data.customer,
       phone: data.phone,
       address: data.address,
       maplink: data.mapLink || null,
-      devicetype: data.deviceType,
+      devicetype: deviceTypes.join(','),
       brand: data.brand,
-      quantity: parseInt(data.quantity) || 1,
+      quantity: Object.values(quantities).reduce((sum, qty) => sum + parseInt(qty || 0), 0) || 1,
       amount: data.amount || null,
       details: data.details,
       paymentmethod: data.paymentMethod,
