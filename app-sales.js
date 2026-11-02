@@ -625,14 +625,25 @@
     const orderId=data.edit_orderId;
     delete data.edit_orderId;
 
+    // Collect device types and quantities
+    const deviceTypeCheckboxes = document.querySelectorAll('#edit_order_form input[name="deviceType"]:checked');
+    const deviceTypes = Array.from(deviceTypeCheckboxes).map(cb => cb.value);
+    const quantities = {};
+    deviceTypes.forEach(type => {
+      const quantityInput = document.querySelector(`#edit_order_form input[name="quantity_${type}"]`);
+      if(quantityInput) {
+        quantities[type] = quantityInput.value;
+      }
+    });
+
     const o={
       customer: data.customer,
       phone: data.phone,
       address: data.address,
       maplink: data.mapLink || null,
-      devicetype: data.deviceType,
+      devicetype: deviceTypes.join(','),
       brand: data.brand,
-      quantity: parseInt(data.quantity) || 1,
+      quantity: Object.values(quantities).reduce((sum, qty) => sum + parseInt(qty || 0), 0) || 1,
       amount: data.amount || null,
       details: data.details,
       paymentmethod: data.paymentMethod,
