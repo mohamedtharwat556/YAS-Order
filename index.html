@@ -178,14 +178,19 @@
     const checkboxes = document.querySelectorAll("input[name=\"deviceType\"]:checked");
     const container = document.getElementById("productQuantities");
     const selectedValues = Array.from(checkboxes).map(cb => cb.value);
-    const container = document.getElementById("productQuantities");
-    // selectedValues already defined above
+    
+    // حفظ القيم الحالية
+    const currentValues = {};
+    container.querySelectorAll('input[type="number"]').forEach(input => {
+      currentValues[input.name] = input.value;
+    });
     
     container.innerHTML = "";
     
     selectedValues.forEach(value => {
       const label = document.createElement("label");
-      label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="1" required>`;
+      const savedValue = currentValues[`quantity_${value}`] || 1;
+      label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="${savedValue}" required>`;
       container.appendChild(label);
     });
   }
