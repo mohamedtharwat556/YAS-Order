@@ -94,9 +94,7 @@
         </section>
         <section class="panel form-panel"><div class="section-title"><span class="step">02</span><div><h3>تفاصيل الطلب</h3><p>الجهاز والماركة والملاحظات</p></div></div>
           <div class="field-grid">
-            <label>نوع الجهاز <em>*</em><select name="deviceType" required><option value="">اختار نوع الجهاز</option><option>لابتوب</option><option>كمبيوتر مكتبي</option><option>شاشة تفاعلية</option><option>جهاز POS / كاشير</option><option>بروجكتور</option><option>إكسسوارات</option><option>أخرى</option></select></label>
-            <label>الماركة / الموديل <em>*</em><input name="brand" required placeholder="مثال: Lenovo ThinkPad" minlength="2"></label>
-            <label>الكمية <input name="quantity" type="number" min="1" max="100" value="1"></label>
+            <label class="full">نوع الجهاز <em>*</em><select name="deviceType" id="deviceType" required multiple onchange="updateProductQuantities()"><option value="">اختار نوع الجهاز (يمكن اختيار أكثر من واحد)</option><option value="لابتوب">لابتوب</option><option value="كمبيوتر مكتبي">كمبيوتر مكتبي</option><option value="شاشة تفاعلية">شاشة تفاعلية</option><option value="جهاز POS / كاشير">جهاز POS / كاشير</option><option value="بروجكتور">بروجكتور</option><option value="إكسسوارات">إكسسوارات</option><option value="أخرى">أخرى</option></select></label><div id="productQuantities" class="product-quantities"></div>
             <label class="full">تفاصيل الطلب <em>*</em><textarea name="details" required rows="3" placeholder="وصف الطلب أو المنتج المطلوب" minlength="5"></textarea></label>
           </div>
         </section>
@@ -142,9 +140,7 @@
         </section>
         <section class="panel form-panel"><div class="section-title"><span class="step">02</span><div><h3>تفاصيل الطلب</h3><p>الجهاز والماركة والملاحظات</p></div></div>
           <div class="field-grid">
-            <label>نوع الجهاز <em>*</em><select name="deviceType" required><option value="">اختار نوع الجهاز</option><option>لابتوب</option><option>كمبيوتر مكتبي</option><option>شاشة تفاعلية</option><option>جهاز POS / كاشير</option><option>بروجكتور</option><option>إكسسوارات</option><option>أخرى</option></select></label>
-            <label>الماركة / الموديل <em>*</em><input name="brand" required placeholder="مثال: Lenovo ThinkPad" minlength="2"></label>
-            <label>الكمية <input name="quantity" type="number" min="1" max="100" value="1"></label>
+            <label class="full">نوع الجهاز <em>*</em><select name="deviceType" id="deviceType" required multiple onchange="updateProductQuantities()"><option value="">اختار نوع الجهاز (يمكن اختيار أكثر من واحد)</option><option value="لابتوب">لابتوب</option><option value="كمبيوتر مكتبي">كمبيوتر مكتبي</option><option value="شاشة تفاعلية">شاشة تفاعلية</option><option value="جهاز POS / كاشير">جهاز POS / كاشير</option><option value="بروجكتور">بروجكتور</option><option value="إكسسوارات">إكسسوارات</option><option value="أخرى">أخرى</option></select></label><div id="productQuantities" class="product-quantities"></div>
             <label class="full">تفاصيل الطلب <em>*</em><textarea name="details" required rows="3" placeholder="وصف الطلب أو المنتج المطلوب" minlength="5"></textarea></label>
           </div>
         </section>
@@ -176,6 +172,21 @@
       <span>جديد</span>
     </button>
   </nav>
+<script>
+  function updateProductQuantities() {
+    const select = document.getElementById("deviceType");
+    const container = document.getElementById("productQuantities");
+    const selectedOptions = Array.from(select.selectedOptions).map(opt => opt.value);
+    
+    container.innerHTML = "";
+    
+    selectedOptions.forEach(value => {
+      const label = document.createElement("label");
+      label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="1" required>`;
+      container.appendChild(label);
+    });
+  }
+</script>
   <div class="toast" id="toast" role="status"></div>
   <script>
     function logout() {
