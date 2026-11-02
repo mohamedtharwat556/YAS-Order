@@ -30,3 +30,4 @@ vercel
 ✅ صفحة تتبع عميل
 ✅ دعم عربي RTL
 ✅ متجاوب مع الهاتف
+# Force Vercel update
