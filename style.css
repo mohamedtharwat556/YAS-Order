@@ -944,3 +944,354 @@ button:active, .btn:active, .icon-btn:active, .nav-item:active {
   }
 }
 
+/* Enhanced Responsive Design for Sales Page */
+@media (max-width: 768px) {
+  /* Sidebar Improvements */
+  .sidebar {
+    width: 85%;
+    max-width: 300px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  }
+
+  .brand img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Main Content Improvements */
+  .main {
+    padding: 12px;
+    margin-right: 0;
+  }
+
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .topbar h1 {
+    font-size: 20px;
+    margin: 0;
+  }
+
+  .top-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Stats Cards Improvements */
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-card h3 {
+    font-size: 28px;
+  }
+
+  .stat-card p {
+    font-size: 12px;
+  }
+
+  /* Table Improvements */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  table {
+    min-width: 800px;
+    font-size: 12px;
+  }
+
+  th, td {
+    padding: 10px 8px;
+    white-space: nowrap;
+  }
+
+  /* Filter Bar Improvements */
+  .filter-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    width: 100%;
+  }
+
+  .filter-bar button {
+    width: 100%;
+  }
+
+  /* Panel Improvements */
+  .panel {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  /* Form Improvements */
+  .field-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-layout label {
+    margin-bottom: 12px;
+  }
+
+  .form-layout input,
+  .form-layout select,
+  .form-layout textarea {
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  /* Button Improvements */
+  .btn {
+    padding: 12px 20px;
+    font-size: 14px;
+    width: 100%;
+  }
+
+  .btn.secondary {
+    margin-top: 8px;
+  }
+
+  /* Action Bar Improvements */
+  .action-bar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .action-bar button {
+    width: 100%;
+  }
+
+  /* Driver Cards Improvements */
+  .driver-card {
+    padding: 16px;
+  }
+
+  .driver-card h3 {
+    font-size: 16px;
+  }
+
+  .driver-card .stat {
+    font-size: 24px;
+  }
+
+  /* Modal Improvements */
+  .modal {
+    width: 95%;
+    max-width: 400px;
+    padding: 20px;
+  }
+
+  .modal h2 {
+    font-size: 18px;
+  }
+
+  /* Toast Improvements */
+  .toast {
+    padding: 12px 20px;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+
+  /* Welcome Section Improvements */
+  .welcome-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .welcome-card {
+    padding: 20px;
+  }
+
+  .welcome-card h2 {
+    font-size: 18px;
+  }
+
+  /* Status Badge Improvements */
+  .status {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  /* Empty State Improvements */
+  .empty {
+    padding: 40px 20px;
+    font-size: 14px;
+  }
+
+  /* Tracking Hero Improvements */
+  .tracking-hero {
+    padding: 20px;
+  }
+
+  .tracking-hero h2 {
+    font-size: 20px;
+  }
+
+  /* Tracking Search Improvements */
+  .tracking-search {
+    padding: 16px;
+  }
+
+  /* Timeline Improvements */
+  .timeline {
+    padding: 16px;
+  }
+
+  .timeline-step {
+    font-size: 13px;
+  }
+
+  /* Tracking Details Improvements */
+  .tracking-details {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* Rating Stars Improvements */
+  .rating-stars {
+    gap: 8px;
+  }
+
+  .star-btn {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra Small Screens */
+  .main {
+    padding: 10px;
+  }
+
+  .topbar h1 {
+    font-size: 18px;
+  }
+
+  .stat-card h3 {
+    font-size: 24px;
+  }
+
+  .stat-card p {
+    font-size: 11px;
+  }
+
+  table {
+    font-size: 11px;
+  }
+
+  th, td {
+    padding: 8px 6px;
+  }
+
+  .btn {
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+
+  .panel {
+    padding: 12px;
+  }
+
+  .field-grid {
+    gap: 10px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  /* Tablet Screens */
+  .sidebar {
+    width: 200px;
+  }
+
+  .main {
+    margin-right: 200px;
+    padding: 20px;
+  }
+
+  .stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .field-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Smooth Transitions */
+.sidebar,
+.main,
+.panel,
+.stat-card,
+.driver-card,
+.btn {
+  transition: all 0.3s ease;
+}
+
+/* Improved Typography on Mobile */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  h1, h2, h3 {
+    line-height: 1.3;
+  }
+
+  p {
+    line-height: 1.6;
+  }
+}
+
+/* Improved Spacing on Mobile */
+@media (max-width: 768px) {
+  .view {
+    margin-bottom: 20px;
+  }
+
+  .panel {
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    margin-bottom: 12px;
+  }
+}
+
+/* Improved Focus States on Mobile */
+@media (max-width: 768px) {
+  button:focus,
+  input:focus,
+  select:focus,
+  textarea:focus {
+    outline: 2px solid var(--blue);
+    outline-offset: 1px;
+  }
+}
+
+/* Improved Scroll on Mobile */
+@media (max-width: 768px) {
+  .table-wrap {
+    scroll-snap-type: x mandatory;
+  }
+
+  .table-wrap table {
+    scroll-snap-align: start;
+  }
+}
+
