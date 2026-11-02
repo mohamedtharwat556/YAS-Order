@@ -53,7 +53,28 @@
         tag: options.tag || 'yas-notification',
         requireInteraction: options.requireInteraction || false
       });
+      
+      // Play sound
+      if (options.sound) {
+        playNotificationSound();
+      }
     }
+  }
+
+  function playNotificationSound() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.value = 800;
+    oscillator.type = 'sine';
+    gainNode.gain.value = 0.3;
+    
+    oscillator.start();
+    oscillator.stop(audioContext.currentTime + 0.2);
   }
 
   // Check for new orders and notify

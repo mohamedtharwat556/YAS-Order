@@ -3,11 +3,22 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>YAS | إدارة الطلبات والتوصيل</title><link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.log('Service Worker registration failed'));
+    }
+
     // Check authentication
     const auth = localStorage.getItem('yas_auth');
     if (!auth || JSON.parse(auth).role !== 'sales') {
@@ -58,7 +69,8 @@
       </div>
       <section class="panel">
         <div class="panel-heading"><div><h3>قائمة الطلبات</h3><p>ابحث برقم الطلب أو اسم العميل أو رقم الهاتف.</p></div><div class="filters">
-          <button class="btn secondary" id="export-excel" title="تصدير إلى Excel">📊 تصدير Excel</button>
+          <button class="btn secondary" id="export-excel" title="تصدير إلى Excel">📊 Excel</button>
+          <button class="btn secondary" id="export-pdf" title="تصدير إلى PDF">📄 PDF</button>
           <button class="btn secondary" id="bulk-update" title="تحديث متعدد">🔄 تحديث حالة متعددة</button>
           <input id="order-search" placeholder="ابحث عن طلب..." aria-label="البحث عن طلب">
           <select id="status-filter"><option value="">كل الحالات</option><option>تم طلبه</option><option>تم الشحن</option><option>خرج للتوصيل</option><option>تم التوصيل</option><option>تعذر التسليم</option></select>

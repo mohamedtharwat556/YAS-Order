@@ -363,6 +363,72 @@
     toast('تم تصدير البيانات بنجاح');
   });
 
+  // Export to PDF
+  $('#export-pdf').addEventListener('click',()=>{
+    const q=($('#order-search').value||'').trim().toLowerCase();
+    const statusFilter=$('#status-filter').value;
+    const paymentFilter=$('#payment-filter').value;
+    const driverFilter=$('#driver-filter').value;
+    const filtered=orders.filter(o=>{
+      const matchesSearch=!q||[o.id,o.customer,o.phone,o.brand].some(v=>String(v||'').toLowerCase().includes(q));
+      const matchesStatus=!statusFilter||o.status===statusFilter;
+      const matchesPayment=!paymentFilter||o.paymentmethod===paymentFilter;
+      const matchesDriver=!driverFilter||o.driver===driverFilter;
+      return matchesSearch&&matchesStatus&&matchesPayment&&matchesDriver;
+    });
+
+    if(filtered.length===0){
+      toast('لا توجد طلبات للتصدير', 'warning');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text('YAS Order Tracking - Orders Report', 105, 20, { align: 'center' });
+    
+    doc.setFontSize(12);
+    doc.text(`Generated: ${new Date().toLocaleDateString('ar-EG')}`, 105, 30, { align: 'center' });
+    
+    // Add table
+    const tableData = filtered.map(o => [
+      o.id,
+      o.customer,
+      o.phone,
+      o.devicetype,
+      o.brand,
+      o.quantity,
+      o.paymentmethod,
+      o.driver,
+      o.status,
+      fmtDate(o.receivedat)
+    ]);
+
+    doc.autoTable({
+      head: [['رقم الطلب', 'العميل', 'الهاتف', 'الجهاز', 'الماركة', 'الكمية', 'الدفع', 'السائق', 'الحالة', 'التاريخ']],
+      body: tableData,
+      startY: 40,
+      styles: {
+        font: 'helvetica',
+        fontSize: 8,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [37, 99, 235],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      alternateRowStyles: {
+        fillColor: [245, 245, 245]
+      }
+    });
+
+    doc.save('YAS-Orders.pdf');
+    toast('تم تصدير البيانات إلى PDF بنجاح');
+  });
+
   // Export to JSON
   $('#export-json').addEventListener('click',()=>{
     if(orders.length===0){

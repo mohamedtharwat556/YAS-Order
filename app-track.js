@@ -118,6 +118,26 @@
     currentOrderId = o.id;
     const notesSection = document.getElementById('customer-notes-section');
     notesSection.classList.remove('hidden');
+
+    // Start live tracking
+    startLiveTracking(o.id);
+  }
+
+  // Live tracking - auto-refresh every 30 seconds
+  let trackingInterval = null;
+
+  function startLiveTracking(orderId) {
+    if (trackingInterval) {
+      clearInterval(trackingInterval);
+    }
+
+    trackingInterval = setInterval(async () => {
+      await loadOrders();
+      const updatedOrder = orders.find(x => x.id === orderId);
+      if (updatedOrder) {
+        showTracking(updatedOrder);
+      }
+    }, 30000); // Update every 30 seconds
   }
   
   // Check if order ID is in URL query
