@@ -112,10 +112,6 @@
   let showCompletedOnly = false;
   
   function renderSales(){
-    $('#stat-total').textContent=orders.length;
-    $('#stat-new').textContent=orders.filter(o=>o.status==='تم طلبه').length;
-    $('#stat-out').textContent=orders.filter(o=>o.status==='خرج للتوصيل').length;
-    $('#stat-done').textContent=orders.filter(o=>o.status==='تم التوصيل').length;
     const q=($('#order-search').value||'').trim().toLowerCase();
     const statusFilter=$('#status-filter').value;
     const paymentFilter=$('#payment-filter').value;

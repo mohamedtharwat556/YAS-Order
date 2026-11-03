@@ -51,12 +51,6 @@
       <div class="filter-actions"><button class="btn secondary" id="toggle-advanced-filters"><i data-lucide="filter"></i> فلاتر متقدمة</button><button class="btn secondary" id="toggle-completed-only"><i data-lucide="check-circle"></i> المكتملة فقط</button><button class="btn secondary" id="export-json"><i data-lucide="download"></i> تصدير JSON</button><button class="btn secondary" id="import-json"><i data-lucide="upload"></i> استيراد JSON</button><button class="btn secondary" id="clear-filters"><i data-lucide="x"></i> مسح الفلاتر</button></div>
       <input type="file" id="import-file" accept=".json" style="display:none;">
       <div class="advanced-filters" id="advanced-filters"><h3>فلاتر متقدمة</h3><div class="field-grid"><label>من تاريخ<input type="date" id="filter-date-from"></label><label>إلى تاريخ<input type="date" id="filter-date-to"></label><label>رقم الهاتف<input type="tel" id="filter-phone" placeholder="رقم الهاتف"></label><label>الحالة المتعددة<select id="filter-multiple-status" multiple><option value="تم طلبه">تم طلبه</option><option value="تم الشحن">تم الشحن</option><option value="خرج للتوصيل">خرج للتوصيل</option><option value="تم التوصيل">تم التوصيل</option><option value="تعذر التسليم">تعذر التسليم</option></select></label></div></div>
-      <div class="stats">
-        <article class="stat-card"><div class="stat-top"><span>إجمالي الطلبات</span><span class="stat-icon blue">▤</span></div><strong id="stat-total">0</strong><small>كل الطلبات المسجلة</small></article>
-        <article class="stat-card"><div class="stat-top"><span>تم طلبه</span><span class="stat-icon gray">◷</span></div><strong id="stat-new">0</strong><small>في انتظار التجهيز</small></article>
-        <article class="stat-card"><div class="stat-top"><span>خرج للتوصيل</span><span class="stat-icon orange">➜</span></div><strong id="stat-out">0</strong><small>مع السائق حاليًا</small></article>
-        <article class="stat-card"><div class="stat-top"><span>تم التوصيل</span><span class="stat-icon green">✓</span></div><strong id="stat-done">0</strong><small>طلبات تم تسليمها</small></article>
-      </div>
       <section class="panel">
         <div class="panel-heading"><div><h3>قائمة الطلبات</h3><p>ابحث برقم الطلب أو اسم العميل أو رقم الهاتف.</p></div><div class="filters">
           <button class="btn secondary" id="export-excel" title="تصدير إلى Excel">📊 Excel</button>
