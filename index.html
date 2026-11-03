@@ -189,7 +189,7 @@
     const totalQuantityInput = container.querySelector('input[name="quantity"]');
     const totalQuantityValue = totalQuantityInput ? totalQuantityInput.value : 1;
     
-    container.innerHTML = `<label>الكمية الإجمالية <input type="number" name="quantity" min="1" max="100" value="${totalQuantityValue}"></label>`;
+    container.innerHTML = `<label>الكمية الإجمالية <input type="number" name="quantity" min="1" max="100" value="${totalQuantityValue}" id="totalQuantity_${formType}" readonly></label>`;
     
     if (selectedValues.length === 0) {
       console.log('No devices selected, only showing total quantity');
@@ -200,10 +200,31 @@
     selectedValues.forEach(value => {
       const label = document.createElement("label");
       const savedValue = currentValues[`quantity_${value}`] || 1;
-      label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="${savedValue}" required>`;
+      label.innerHTML = `الكمية (${value}) <input type="number" name="quantity_${value}" min="1" max="100" value="${savedValue}" required onchange="calculateTotalQuantity('${formType}')" oninput="calculateTotalQuantity('${formType}')">`;
       container.appendChild(label);
     });
+    
+    // حساب الإجمالي الأولي
+    calculateTotalQuantity(formType);
     console.log('Product quantities updated successfully');
+  }
+  
+  function calculateTotalQuantity(formType) {
+    const containerId = formType === 'new' ? 'productQuantitiesNew' : 'productQuantities';
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    const totalInput = document.getElementById(`totalQuantity_${formType}`);
+    if (!totalInput) return;
+    
+    const quantityInputs = container.querySelectorAll('input[type="number"][name^="quantity_"]');
+    let total = 0;
+    quantityInputs.forEach(input => {
+      total += parseInt(input.value) || 0;
+    });
+    
+    totalInput.value = total || 1;
+    console.log('Total quantity calculated:', total);
   }
 </script>
   <div class="toast" id="toast" role="status"></div>
