@@ -16,7 +16,47 @@
   // Initialize Lucide icons
   document.addEventListener('DOMContentLoaded', () => {
     lucide.createIcons();
+    
+    // Request notification permission
+    requestNotificationPermission();
   });
+
+  // Browser Notifications
+  function requestNotificationPermission() {
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        if (permission === 'granted') {
+          console.log('Notification permission granted');
+          new Notification('YAS Order Tracking', {
+            body: 'تم تفعيل الإشعارات بنجاح! ستنصرك عندما يقترب السائق.',
+            icon: '🚗'
+          });
+        } else {
+          console.log('Notification permission denied');
+        }
+      });
+    } else {
+      console.log('This browser does not support notifications');
+    }
+  }
+
+  function showNotification(title, body, options = {}) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, {
+        body: body,
+        icon: options.icon || '🚗',
+        sound: options.sound || 'default'
+      });
+    }
+  }
+
+  // Play notification sound
+  function playNotificationSound() {
+    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+    audio.play().catch(error => {
+      console.log('Error playing sound:', error);
+    });
+  }
 
   // Driver rating functionality
   window.submitDriverRating = async function(orderId) {
@@ -338,6 +378,30 @@
       const hours = Math.floor(etaMinutes / 60);
       const mins = etaMinutes % 60;
       etaTime.textContent = `${hours} ساعة و ${mins} دقيقة`;
+    }
+
+    // Check for proximity notification (500 meters = 0.5 km)
+    checkProximityNotification(distance);
+  }
+
+  // Check if driver is close and send notification
+  let notificationSent = false;
+  function checkProximityNotification(distance) {
+    const proximityThreshold = 0.5; // 500 meters in km
+
+    if (distance <= proximityThreshold && !notificationSent) {
+      console.log('Driver is within 500 meters, sending notification');
+      showNotification(
+        'السائق قريب! 🚗',
+        'السائق على بعد أقل من 500 متر من موقعك. كن مستعداً لاستلام الطلب.',
+        { icon: '🚗' }
+      );
+      playNotificationSound();
+      notificationSent = true;
+      toast('السائق قريب من موقعك! 🚗', 'success');
+    } else if (distance > proximityThreshold) {
+      // Reset notification flag if driver moves away
+      notificationSent = false;
     }
   }
   
