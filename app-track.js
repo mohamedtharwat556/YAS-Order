@@ -128,6 +128,16 @@
 
     // Load initial driver location
     loadDriverLocation(o.id);
+
+    // If no driver location, show demo location for testing
+    setTimeout(() => {
+      if (!driverMarker) {
+        console.log('No driver location found, showing demo location');
+        updateDriverMap(30.0444, 31.2357);
+        document.getElementById('eta-info').style.display = 'block';
+        document.getElementById('eta-time').textContent = 'وضع تجريبي - لا يوجد موقع حقيقي';
+      }
+    }, 2000);
   }
 
   // Live tracking - auto-refresh every 30 seconds
