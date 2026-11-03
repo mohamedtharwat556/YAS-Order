@@ -106,6 +106,13 @@
       updateProductQuantities('new');
     }
     if(view==='dashboard')renderDashboard();
+    
+    // Update bottom nav active state
+    document.querySelectorAll('.bottom-nav-item').forEach(item => {
+      if(item.dataset.view === 'new_order') {
+        item.classList.toggle('active', view === 'new_order');
+      }
+    });
   }
   window.go = go;
   function setReceivedAt(){const el=$('#received-at');if(el&&!el.value){const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());el.value=d.toISOString().slice(0,16);}}
@@ -783,13 +790,4 @@ document.querySelectorAll('.bottom-nav-item').forEach(item => {
     go(view);
   });
 });
-
-// Update bottom nav active state
-const originalGo = go;
-go = function(view) {
-  originalGo(view);
-  document.querySelectorAll('.bottom-nav-item').forEach(item => {
-    item.classList.toggle('active', item.dataset.view === view);
-  });
-};
 
