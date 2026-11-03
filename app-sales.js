@@ -103,7 +103,7 @@
     if(view==='sales')renderSales();
     if(view==='new_order'){
       setReceivedAt();
-      updateProductQuantities();
+      updateProductQuantities('new');
     }
     if(view==='dashboard')renderDashboard();
   }
@@ -501,7 +501,7 @@
           });
         }
         // Trigger updateProductQuantities to show quantity fields
-        updateProductQuantities();
+        updateProductQuantities('edit');
         $('#edit_order_form').elements.brand.value=o.brand;
         // Skip quantity field as it's now handled dynamically
         $('#edit_order_form').elements.details.value=o.details;
@@ -582,7 +582,7 @@
     const deviceTypes = Array.from(deviceTypeCheckboxes).map(cb => cb.value);
     const quantities = {};
     deviceTypes.forEach(type => {
-      const quantityInput = document.querySelector(`#order-form input[name="quantity_${type}"]`);
+      const quantityInput = document.querySelector(`#productQuantitiesNew input[name="quantity_${type}"]`);
       if(quantityInput) {
         quantities[type] = quantityInput.value;
       }
@@ -644,7 +644,7 @@
     const deviceTypes = Array.from(deviceTypeCheckboxes).map(cb => cb.value);
     const quantities = {};
     deviceTypes.forEach(type => {
-      const quantityInput = document.querySelector(`#edit_order_form input[name="quantity_${type}"]`);
+      const quantityInput = document.querySelector(`#productQuantitiesEdit input[name="quantity_${type}"]`);
       if(quantityInput) {
         quantities[type] = quantityInput.value;
       }
