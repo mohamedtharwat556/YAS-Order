@@ -150,11 +150,20 @@
 
   // Multiple ratings functionality
   window.submitMultipleRatings = async function(orderId) {
+    console.log('Submitting multiple ratings for order:', orderId);
+    
     const driverRating = document.querySelector(`#driver-rating .star-btn.selected`);
     const productRating = document.querySelector(`#product-rating .star-btn.selected`);
     const serviceRating = document.querySelector(`#service-rating .star-btn.selected`);
 
+    console.log('Selected ratings:', {
+      driver: driverRating?.dataset.rating,
+      product: productRating?.dataset.rating,
+      service: serviceRating?.dataset.rating
+    });
+
     if (!driverRating || !productRating || !serviceRating) {
+      console.log('Missing ratings');
       toast('الرجاء اختيار تقييم لجميع الفئات', 'warning');
       return;
     }
@@ -165,12 +174,17 @@
       service_rating: parseInt(serviceRating.dataset.rating)
     };
 
+    console.log('Ratings to save:', ratings);
+
     const { error } = await supabaseClient.from('orders').update(ratings).eq('id', orderId);
     if (error) {
       console.error('Error submitting ratings:', error);
-      toast('حدث خطأ أثناء إرسال التقييمات', 'error');
+      console.error('Error details:', JSON.stringify(error, null, 2));
+      toast('حدث خطأ أثناء إرسال التقييمات: ' + error.message, 'error');
       return;
     }
+    
+    console.log('Ratings saved successfully');
     toast('تم إرسال التقييمات بنجاح');
     await loadOrders();
     const o = orders.find(x => x.id === orderId);
