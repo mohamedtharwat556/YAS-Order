@@ -3,8 +3,10 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <title>YAS | تتبع طلبك</title><link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="app-shell">
   <main class="main full-width">
@@ -13,6 +15,13 @@
       <div class="tracking-hero"><div class="eyebrow">ORDER TRACKING</div><h2>طلبك فين دلوقتي؟</h2><p>اكتب رقم الطلب ورقم الهاتف المسجل عشان تتابع حالة التوصيل.</p></div>
       <form id="tracking-form" class="tracking-search panel"><label>رقم الطلب<input id="order-input" name="orderId" required placeholder="YAS-1" pattern="YAS-[0-9]+" title="رقم الطلب بالشكل: YAS-1"></label><label>رقم الهاتف<input id="phone-input" name="phone" required inputmode="tel" placeholder="رقم الهاتف المسجل" pattern="01[0-9]{9}" title="رقم الهاتف يجب أن يبدأ بـ 01 ويكون 11 رقم"></label><button class="btn primary" type="submit">تتبع الطلب ←</button></form>
       <div id="tracking-result" class="tracking-result hidden"></div>
+      <div id="map-container" class="panel hidden" style="margin-top: 20px;">
+        <div class="section-title"><h3>موقع السائق الحي</h3><p>تتبع موقع السائق في الوقت الفعلي</p></div>
+        <div id="map" style="height: 300px; border-radius: 8px;"></div>
+        <div id="eta-info" style="margin-top: 10px; padding: 10px; background: var(--blue2); border-radius: 8px; display: none;">
+          <strong>تقدير وقت الوصول:</strong> <span id="eta-time">--</span>
+        </div>
+      </div>
       <div id="customer-notes-section" class="panel hidden" style="margin-top: 20px;"><div class="section-title"><h3>ملاحظات العميل</h3><p>اكتب أي ملاحظات أو طلبات إضافية</p></div><textarea id="customer-notes" rows="3" placeholder="اكتب ملاحظاتك هنا..." style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;"></textarea><button class="btn primary" onclick="saveCustomerNotes()" style="margin-top:10px;">إرسال الملاحظات</button></div>
     </section>
   </main>

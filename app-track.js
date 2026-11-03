@@ -119,12 +119,22 @@
     const notesSection = document.getElementById('customer-notes-section');
     notesSection.classList.remove('hidden');
 
+    // Show map container
+    const mapContainer = document.getElementById('map-container');
+    mapContainer.classList.remove('hidden');
+
     // Start live tracking
     startLiveTracking(o.id);
+
+    // Load initial driver location
+    loadDriverLocation(o.id);
   }
 
   // Live tracking - auto-refresh every 30 seconds
   let trackingInterval = null;
+  let map = null;
+  let driverMarker = null;
+  let customerMarker = null;
 
   function startLiveTracking(orderId) {
     if (trackingInterval) {
@@ -136,8 +146,137 @@
       const updatedOrder = orders.find(x => x.id === orderId);
       if (updatedOrder) {
         showTracking(updatedOrder);
+        await loadDriverLocation(orderId);
       }
     }, 30000); // Update every 30 seconds
+  }
+
+  // Load driver location from driver_locations table
+  async function loadDriverLocation(orderId) {
+    const { data, error } = await supabaseClient
+      .from('driver_locations')
+      .select('*')
+      .eq('order_id', orderId)
+      .order('timestamp', { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error('Error loading driver location:', error);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      const location = data[0];
+      updateDriverMap(location.latitude, location.longitude);
+      calculateETA(location);
+    }
+  }
+
+  // Initialize map
+  function initMap() {
+    if (map) return;
+
+    map = L.map('map').setView([30.0444, 31.2357], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+  }
+
+  // Update driver marker on map
+  function updateDriverMap(lat, lng) {
+    if (!map) initMap();
+
+    if (driverMarker) {
+      driverMarker.setLatLng([lat, lng]);
+    } else {
+      driverMarker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '🚗',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(map);
+      driverMarker.bindPopup('السائق هنا');
+    }
+
+    map.setView([lat, lng], 13);
+  }
+
+  // Add customer marker
+  function addCustomerMarker(lat, lng) {
+    if (!map) initMap();
+
+    if (customerMarker) {
+      customerMarker.setLatLng([lat, lng]);
+    } else {
+      customerMarker = L.marker([lat, lng], {
+        icon: L.divIcon({
+          className: 'custom-marker',
+          html: '📍',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15]
+        })
+      }).addTo(map);
+      customerMarker.bindPopup('موقع العميل');
+    }
+  }
+
+  // Calculate distance between two points using Haversine formula
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+
+  // Calculate ETA (Estimated Time of Arrival)
+  function calculateETA(driverLocation) {
+    const etaInfo = document.getElementById('eta-info');
+    const etaTime = document.getElementById('eta-time');
+
+    if (!currentOrderId) return;
+
+    const order = orders.find(x => x.id === currentOrderId);
+    if (!order || !order.location) return;
+
+    // Parse customer location from order
+    const customerLat = parseFloat(order.location.lat);
+    const customerLng = parseFloat(order.location.lng);
+
+    if (!customerLat || !customerLng) return;
+
+    // Add customer marker to map
+    addCustomerMarker(customerLat, customerLng);
+
+    // Calculate distance
+    const distance = calculateDistance(
+      driverLocation.latitude,
+      driverLocation.longitude,
+      customerLat,
+      customerLng
+    );
+
+    // Estimate time (assuming average speed of 40 km/h)
+    const avgSpeed = 40; // km/h
+    const etaHours = distance / avgSpeed;
+    const etaMinutes = Math.round(etaHours * 60);
+
+    // Display ETA
+    etaInfo.style.display = 'block';
+    if (etaMinutes < 1) {
+      etaTime.textContent = 'أقل من دقيقة';
+    } else if (etaMinutes < 60) {
+      etaTime.textContent = `${etaMinutes} دقيقة`;
+    } else {
+      const hours = Math.floor(etaMinutes / 60);
+      const mins = etaMinutes % 60;
+      etaTime.textContent = `${hours} ساعة و ${mins} دقيقة`;
+    }
   }
   
   // Check if order ID is in URL query

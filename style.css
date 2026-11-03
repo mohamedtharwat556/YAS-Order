@@ -1356,3 +1356,10 @@ button:active, .btn:active, .icon-btn:active, .nav-item:active {
   outline-offset: 1px;
 }
 
+/* Custom Map Marker */
+.custom-marker {
+  font-size: 24px;
+  text-align: center;
+  line-height: 30px;
+}
+

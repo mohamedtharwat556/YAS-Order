@@ -183,12 +183,27 @@
 
         // Try to update, if offline save to queue
         try {
+          // Update orders table
           for (const o of driverOrders) {
             const { error } = await supabaseClient
               .from('orders')
               .update({ location: loc })
               .eq('id', o.id);
             if (error) throw error;
+          }
+
+          // Save to driver_locations table for real-time tracking
+          for (const o of driverOrders) {
+            const { error } = await supabaseClient
+              .from('driver_locations')
+              .insert({
+                driver_id: driverName,
+                order_id: o.id,
+                latitude: parseFloat(loc.lat),
+                longitude: parseFloat(loc.lng),
+                accuracy: pos.coords.accuracy
+              });
+            if (error) console.error('Error saving to driver_locations:', error);
           }
         } catch (error) {
           console.error('Error updating location (offline mode):', error);
@@ -564,6 +579,18 @@
           .update({ location: loc })
           .eq('id', o.id);
         if (error) console.error('Error updating location:', error);
+
+        // Save to driver_locations table
+        const { error: locError } = await supabaseClient
+          .from('driver_locations')
+          .insert({
+            driver_id: driverName,
+            order_id: o.id,
+            latitude: parseFloat(loc.lat),
+            longitude: parseFloat(loc.lng),
+            accuracy: pos.coords.accuracy
+          });
+        if (locError) console.error('Error saving to driver_locations:', locError);
       }
 
       output.textContent=`آخر تحديث: ${loc.lat}, ${loc.lng} · ${fmtTime(loc.at)}`;
