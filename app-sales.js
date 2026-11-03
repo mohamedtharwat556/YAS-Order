@@ -43,7 +43,9 @@
       paymentMethod: o.paymentmethod || o.paymentMethod,
       paymentStatus: o.paymentstatus || o.paymentStatus,
       receivedAt: o.receivedat || o.receivedAt,
-      driverRating: o.driverrating || o.driverRating,
+      driverRating: o.driverrating || o.driver_rating,
+      productRating: o.productrating || o.product_rating,
+      serviceRating: o.servicerating || o.service_rating,
       customerNotes: o.customernotes || o.customerNotes
     }));
     renderSales();
