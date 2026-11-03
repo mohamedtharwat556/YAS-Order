@@ -10,9 +10,19 @@
 </head>
 <body class="app-shell">
   <main class="main full-width">
-    <header class="topbar"><div><img src="logo-full.jpg" alt="YAS Order" style="height: 50px; margin-right: 10px;"><div class="eyebrow">YAS</div><h1>تتبع طلبك</h1></div><button id="notification-bell" class="notification-bell-header" onclick="toggleNotificationPanel()"><span id="notification-count" class="notification-count hidden">0</span>🔔</button></header>
+    <header class="topbar"><div><img src="logo-full.jpg" alt="YAS Order" style="height: 50px; margin-right: 10px;"><div class="eyebrow">YAS</div><h1>تتبع طلبك</h1></div></header>
     <section class="view active" style="max-width:600px;margin:2rem auto;">
-      <div class="tracking-hero"><div class="eyebrow">ORDER TRACKING</div><h2>طلبك فين دلوقتي؟</h2><p>اكتب رقم الطلب ورقم الهاتف المسجل عشان تتابع حالة التوصيل.</p></div>
+      <div class="tracking-hero">
+        <div class="eyebrow">ORDER TRACKING</div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h2>طلبك فين دلوقتي؟</h2>
+          <button id="notification-bell" class="notification-bell-header" onclick="toggleNotificationPanel()">
+            <span id="notification-count" class="notification-count hidden">0</span>
+            🔔
+          </button>
+        </div>
+        <p>اكتب رقم الطلب ورقم الهاتف المسجل عشان تتابع حالة التوصيل.</p>
+      </div>
       <form id="tracking-form" class="tracking-search panel"><label>رقم الطلب<input id="order-input" name="orderId" required placeholder="YAS-1" pattern="YAS-[0-9]+" title="رقم الطلب بالشكل: YAS-1"></label><label>رقم الهاتف<input id="phone-input" name="phone" required inputmode="tel" placeholder="رقم الهاتف المسجل" pattern="01[0-9]{9}" title="رقم الهاتف يجب أن يبدأ بـ 01 ويكون 11 رقم"></label><button class="btn primary" type="submit">تتبع الطلب ←</button></form>
       <div id="tracking-result" class="tracking-result hidden"></div>
       <div id="map-container" class="panel hidden" style="margin-top: 20px;">
