@@ -164,6 +164,8 @@
   // Load driver location from driver_locations table
   async function loadDriverLocation(orderId) {
     console.log('Loading driver location for order:', orderId);
+    
+    // First try to get from driver_locations table
     const { data, error } = await supabaseClient
       .from('driver_locations')
       .select('*')
@@ -173,18 +175,46 @@
 
     if (error) {
       console.error('Error loading driver location:', error);
-      return;
     }
 
-    console.log('Driver location data:', data);
+    console.log('Driver location data from driver_locations:', data);
 
     if (data && data.length > 0) {
       const location = data[0];
-      console.log('Updating map with location:', location);
+      console.log('Updating map with location from driver_locations:', location);
       updateDriverMap(location.latitude, location.longitude);
       calculateETA(location);
     } else {
-      console.log('No driver location found yet');
+      console.log('No driver location in driver_locations, trying orders table...');
+      
+      // Fallback: get location from orders table
+      const { data: orderData, error: orderError } = await supabaseClient
+        .from('orders')
+        .select('location')
+        .eq('id', orderId)
+        .single();
+
+      if (orderError) {
+        console.error('Error loading order location:', orderError);
+        return;
+      }
+
+      console.log('Order location data:', orderData);
+
+      if (orderData && orderData.location && orderData.location.lat) {
+        const lat = parseFloat(orderData.location.lat);
+        const lng = parseFloat(orderData.location.lng);
+        console.log('Updating map with location from orders table:', lat, lng);
+        updateDriverMap(lat, lng);
+        
+        // Calculate ETA from orders location
+        calculateETA({
+          latitude: lat,
+          longitude: lng
+        });
+      } else {
+        console.log('No location found in orders table either');
+      }
     }
   }
 
