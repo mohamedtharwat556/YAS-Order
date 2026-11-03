@@ -176,7 +176,7 @@
 
     console.log('Ratings to save:', ratings);
 
-    const { error } = await supabaseClient.from('orders').update(ratings).eq('id', orderId);
+    const { data, error } = await supabaseClient.from('orders').update(ratings).eq('id', orderId).select();
     if (error) {
       console.error('Error submitting ratings:', error);
       console.error('Error details:', JSON.stringify(error, null, 2));
@@ -184,11 +184,18 @@
       return;
     }
     
-    console.log('Ratings saved successfully');
+    console.log('Ratings saved successfully:', data);
     toast('تم إرسال التقييمات بنجاح');
+    
+    // Reload orders to get updated data
     await loadOrders();
+    
+    // Refresh the tracking view
     const o = orders.find(x => x.id === orderId);
-    if (o) showTracking(o);
+    if (o) {
+      console.log('Updated order:', o);
+      showTracking(o);
+    }
   };
 
   // Handle star button clicks
