@@ -125,9 +125,21 @@ CREATE INDEX idx_driver_locations_order ON driver_locations(order_id);
 CREATE INDEX idx_driver_locations_timestamp ON driver_locations(timestamp DESC);
 
 -- ============================================
+-- ADD MULTIPLE RATING COLUMNS TO ORDERS TABLE
+-- ============================================
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS driver_rating INTEGER;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS product_rating INTEGER;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS service_rating INTEGER;
+
+-- ============================================
 -- NOTES
 -- ============================================
 -- This schema contains two tables:
 -- 1. orders - manages all order-related data
 -- 2. driver_locations - stores GPS locations of drivers for real-time tracking
+-- 
+-- Rating columns (1-5 stars):
+-- - driver_rating: تقييم السائق
+-- - product_rating: تقييم المنتج
+-- - service_rating: تقييم الخدمة
 -- ============================================

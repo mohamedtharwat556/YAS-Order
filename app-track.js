@@ -136,13 +136,42 @@
       return;
     }
     const rating = parseInt(selectedRating.dataset.rating);
-    const { error } = await supabaseClient.from('orders').update({ driverrating: rating }).eq('id', orderId);
+    const { error } = await supabaseClient.from('orders').update({ driver_rating: rating }).eq('id', orderId);
     if (error) {
       console.error('Error submitting rating:', error);
       toast('حدث خطأ أثناء إرسال التقييم', 'error');
       return;
     }
     toast('تم إرسال التقييم بنجاح');
+    await loadOrders();
+    const o = orders.find(x => x.id === orderId);
+    if (o) showTracking(o);
+  };
+
+  // Multiple ratings functionality
+  window.submitMultipleRatings = async function(orderId) {
+    const driverRating = document.querySelector(`#driver-rating .star-btn.selected`);
+    const productRating = document.querySelector(`#product-rating .star-btn.selected`);
+    const serviceRating = document.querySelector(`#service-rating .star-btn.selected`);
+
+    if (!driverRating || !productRating || !serviceRating) {
+      toast('الرجاء اختيار تقييم لجميع الفئات', 'warning');
+      return;
+    }
+
+    const ratings = {
+      driver_rating: parseInt(driverRating.dataset.rating),
+      product_rating: parseInt(productRating.dataset.rating),
+      service_rating: parseInt(serviceRating.dataset.rating)
+    };
+
+    const { error } = await supabaseClient.from('orders').update(ratings).eq('id', orderId);
+    if (error) {
+      console.error('Error submitting ratings:', error);
+      toast('حدث خطأ أثناء إرسال التقييمات', 'error');
+      return;
+    }
+    toast('تم إرسال التقييمات بنجاح');
     await loadOrders();
     const o = orders.find(x => x.id === orderId);
     if (o) showTracking(o);
@@ -221,8 +250,8 @@
     ${o.status==='تعذر التسليم'?'<p class="danger">تعذر تسليم الطلب. برجاء التواصل مع فريق خدمة العملاء.</p>':''}
     <div class="tracking-details"><div><small>الجهاز</small><b>${esc(o.devicetype)} · ${esc(o.brand)}</b></div><div><small>طريقة الدفع</small><b>${esc(o.paymentmethod)}</b></div><div><small>تاريخ الطلب</small><b>${fmtDate(o.receivedat)}</b></div><div><small>العنوان</small><b>${esc(o.address)}</b></div><div><small>السائق</small><b>${esc(o.driver||'سيتم تحديده')}</b></div>${o.driverphone?`<div><small>رقم السائق</small><b><a href="tel:${esc(o.driverphone)}">${esc(o.driverphone)}</a></b></div>`:''}<div><small>آخر موقع مُسجل</small><b>${o.location?`${esc(o.location.lat)}, ${esc(o.location.lng)}`:'لا يوجد تحديث موقع حتى الآن'}</b></div></div>
     ${o.location?`<p class="muted">آخر تحديث يدوي لموقع السائق: ${fmtTime(o.location.at)} · <a target="_blank" rel="noopener" href="https://maps.google.com/?q=${encodeURIComponent(o.location.lat+','+o.location.lng)}">عرض الموقع على الخريطة</a></p>`:''}
-    ${o.status==='تم التوصيل'&&!o.driverRating?`<div class="driver-rating"><h3>قيّم السائق</h3><div class="rating-stars" data-order-id="${esc(o.id)}">${[1,2,3,4,5].map(i=>`<button class="star-btn" data-rating="${i}" aria-label="${i} نجوم">★</button>`).join('')}</div><button class="btn primary" onclick="submitDriverRating('${esc(o.id)}')">إرسال التقييم</button></div>`:''}
-    ${o.driverRating?`<div class="driver-rating-display"><h3>تقييم السائق</h3><div class="rating-stars-display">${'★'.repeat(o.driverRating)}${'☆'.repeat(5-o.driverRating)}</div></div>`:''}`;
+    ${o.status==='تم التوصيل' && (!o.driverRating || !o.productRating || !o.serviceRating)?`<div class="multiple-ratings"><h3>قيّم تجربتك</h3><p>قيّم السائق والمنتج والخدمة</p><div class="rating-section"><label>تقييم السائق</label><div id="driver-rating" class="rating-stars">${[1,2,3,4,5].map(i=>`<button class="star-btn" data-rating="${i}" aria-label="${i} نجوم">★</button>`).join('')}</div></div><div class="rating-section"><label>تقييم المنتج</label><div id="product-rating" class="rating-stars">${[1,2,3,4,5].map(i=>`<button class="star-btn" data-rating="${i}" aria-label="${i} نجوم">★</button>`).join('')}</div></div><div class="rating-section"><label>تقييم الخدمة</label><div id="service-rating" class="rating-stars">${[1,2,3,4,5].map(i=>`<button class="star-btn" data-rating="${i}" aria-label="${i} نجوم">★</button>`).join('')}</div></div><button class="btn primary" onclick="submitMultipleRatings('${esc(o.id)}')">إرسال التقييمات</button></div>`:''}
+    ${o.driverRating || o.productRating || o.serviceRating?`<div class="ratings-display"><h3>تقييماتك</h3><div class="rating-item"><label>السائق:</label><div class="rating-stars-display">${'★'.repeat(o.driverRating||0)}${'☆'.repeat(5-(o.driverRating||0))}</div></div><div class="rating-item"><label>المنتج:</label><div class="rating-stars-display">${'★'.repeat(o.productRating||0)}${'☆'.repeat(5-(o.productRating||0))}</div></div><div class="rating-item"><label>الخدمة:</label><div class="rating-stars-display">${'★'.repeat(o.serviceRating||0)}${'☆'.repeat(5-(o.serviceRating||0))}</div></div></div>`:''}`;
     
     // Show customer notes section
     currentOrderId = o.id;
