@@ -153,6 +153,7 @@
 
   // Load driver location from driver_locations table
   async function loadDriverLocation(orderId) {
+    console.log('Loading driver location for order:', orderId);
     const { data, error } = await supabaseClient
       .from('driver_locations')
       .select('*')
@@ -165,30 +166,50 @@
       return;
     }
 
+    console.log('Driver location data:', data);
+
     if (data && data.length > 0) {
       const location = data[0];
+      console.log('Updating map with location:', location);
       updateDriverMap(location.latitude, location.longitude);
       calculateETA(location);
+    } else {
+      console.log('No driver location found yet');
     }
   }
 
   // Initialize map
   function initMap() {
-    if (map) return;
+    console.log('Initializing map...');
+    if (map) {
+      console.log('Map already initialized');
+      return;
+    }
 
+    const mapContainer = document.getElementById('map');
+    if (!mapContainer) {
+      console.error('Map container not found');
+      return;
+    }
+
+    console.log('Map container found, creating map...');
     map = L.map('map').setView([30.0444, 31.2357], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(map);
+    console.log('Map initialized successfully');
   }
 
   // Update driver marker on map
   function updateDriverMap(lat, lng) {
+    console.log('Updating driver map with lat:', lat, 'lng:', lng);
     if (!map) initMap();
 
     if (driverMarker) {
+      console.log('Updating existing marker');
       driverMarker.setLatLng([lat, lng]);
     } else {
+      console.log('Creating new marker');
       driverMarker = L.marker([lat, lng], {
         icon: L.divIcon({
           className: 'custom-marker',
@@ -201,6 +222,7 @@
     }
 
     map.setView([lat, lng], 13);
+    console.log('Map updated successfully');
   }
 
   // Add customer marker
