@@ -48,7 +48,77 @@
         sound: options.sound || 'default'
       });
     }
+    
+    // Also add to notification panel
+    addNotificationToPanel(title, body);
   }
+
+  // Notification Panel Management
+  let notifications = [];
+
+  function addNotificationToPanel(title, body) {
+    const notification = {
+      id: Date.now(),
+      title: title,
+      body: body,
+      time: new Date(),
+      read: false
+    };
+    
+    notifications.unshift(notification);
+    updateNotificationPanel();
+    updateNotificationCount();
+  }
+
+  function updateNotificationPanel() {
+    const list = document.getElementById('notification-list');
+    if (!list) return;
+    
+    if (notifications.length === 0) {
+      list.innerHTML = '<p class="empty-notifications">لا توجد إشعارات</p>';
+      return;
+    }
+    
+    list.innerHTML = notifications.map(n => `
+      <div class="notification-item ${n.read ? '' : 'unread'}" onclick="markAsRead(${n.id})">
+        <h4>${esc(n.title)}</h4>
+        <p>${esc(n.body)}</p>
+        <div class="time">${fmtTime(n.time)}</div>
+      </div>
+    `).join('');
+  }
+
+  function updateNotificationCount() {
+    const countEl = document.getElementById('notification-count');
+    if (!countEl) return;
+    
+    const unreadCount = notifications.filter(n => !n.read).length;
+    
+    if (unreadCount > 0) {
+      countEl.textContent = unreadCount;
+      countEl.classList.remove('hidden');
+    } else {
+      countEl.classList.add('hidden');
+    }
+  }
+
+  function markAsRead(id) {
+    const notification = notifications.find(n => n.id === id);
+    if (notification) {
+      notification.read = true;
+      updateNotificationPanel();
+      updateNotificationCount();
+    }
+  }
+
+  window.toggleNotificationPanel = function() {
+    const panel = document.getElementById('notification-panel');
+    if (panel) {
+      panel.classList.toggle('hidden');
+    }
+  };
+
+  window.markAsRead = markAsRead;
 
   // Play notification sound
   function playNotificationSound() {
