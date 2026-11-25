@@ -221,7 +221,10 @@
   <div class="toast" id="toast" role="status"></div>
   <script>
     function logout() {
+      console.log('Logout function called');
       localStorage.removeItem('yas_auth');
+      console.log('Auth removed from localStorage');
+      console.log('Redirecting to login.html');
       window.location.href = 'login.html';
     }
 
