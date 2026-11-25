@@ -10,8 +10,18 @@
   <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     // Check authentication
-    const auth = localStorage.getItem('yas_auth');
-    if (!auth || JSON.parse(auth).role !== 'sales') {
+    try {
+      const auth = localStorage.getItem('yas_auth');
+      if (!auth) {
+        window.location.href = 'login.html';
+      } else {
+        const authData = JSON.parse(auth);
+        if (authData.role !== 'sales') {
+          window.location.href = 'login.html';
+        }
+      }
+    } catch (e) {
+      console.error('Auth check error:', e);
       window.location.href = 'login.html';
     }
   </script>
